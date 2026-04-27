@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>My Budget</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;1,300&family=Jost:wght@300;400;500&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <div class="app">
+
+      <!-- Header -->
+      <header class="header">
+        <h1>my <em>budget</em></h1>
+        <select class="month-sel" id="monthSel"></select>
+      </header>
+
+      <!-- Overview Pills -->
+      <section class="overview" id="overview" aria-label="Budget overview"></section>
+
+      <!-- Income (collapsible) -->
+      <section class="income-section">
+        <button class="income-toggle" id="incomeToggle" aria-expanded="false">
+          <div class="tog-left">
+            <span class="tog-title">income &amp; taxes</span>
+            <span class="tog-sub" id="incSub"></span>
+          </div>
+          <span class="tog-arrow" aria-hidden="true">▾</span>
+        </button>
+        <div class="income-panel" id="incomePanel" aria-hidden="true"></div>
+      </section>
+
+      <!-- Main Grid -->
+      <div class="main-grid">
+
+        <!-- Expenses (left / main) -->
+        <section class="card expenses-card">
+          <div class="card-header">
+            <h2 class="card-title">expenses</h2>
+            <button class="btn btn-dark" id="addExpBtn">+ add expense</button>
+          </div>
+          <div class="legend">
+            <div class="leg-item">
+              <span class="cat-dot" style="background: var(--ink3)"></span>
+              dot color matches its budget line
+            </div>
+          </div>
+          <div id="expList"></div>
+          <div class="total-row">
+            <span class="total-label">total out</span>
+            <span class="total-val" id="expTotal"></span>
+          </div>
+        </section>
+
+        <!-- Right column -->
+        <aside class="right-col">
+
+          <!-- Budgeted categories -->
+          <div class="card">
+            <div class="card-header">
+              <h2 class="card-title">budgeted</h2>
+              <button class="btn btn-soft" id="addBudBtn">+ add</button>
+            </div>
+            <div class="bud-col-heads">
+              <span>item</span>
+              <span>est</span>
+              <span>real</span>
+              <span>diff</span>
+              <span></span>
+            </div>
+            <div id="budList"></div>
+            <div class="divider"></div>
+            <div class="total-row">
+              <span class="total-label">budgeted</span>
+              <span class="total-val" id="budTotal"></span>
+            </div>
+          </div>
+
+          <!-- Remaining -->
+          <div class="card remaining-card">
+            <div class="pill-label">remaining this month</div>
+            <div class="remaining-val" id="remainingVal"></div>
+            <div class="remaining-note" id="remainingNote"></div>
+            <div class="progress-track">
+              <div class="progress-bar" id="remainBar"></div>
+            </div>
+          </div>
+
+        </aside>
+      </div>
+    </div>
+
+    <script src="state.js"></script>
+    <script src="render.js"></script>
+    <script src="events.js"></script>
+    <script>
+      render();
+    </script>
+  </body>
+</html>

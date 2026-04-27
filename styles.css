@@ -1,0 +1,557 @@
+/* ─────────────────────────────────────────────
+   Fonts & Custom Properties
+───────────────────────────────────────────── */
+:root {
+  /* Palette */
+  --cloud:  #f5f3f0;
+  --cloud2: #ede9e4;
+  --cloud3: #e5dfd8;
+  --ink:    #2e2a26;
+  --ink2:   #7a6f65;
+  --ink3:   #b0a79f;
+  --blush:  #e8d5cd;
+  --blush2: #d4b5a8;
+  --sage:   #c8d4c2;
+  --sage2:  #9db394;
+  --lav:    #d4cde8;
+  --lav2:   #a89fc8;
+
+  /* Semantic */
+  --positive: #7a9e7e;
+  --negative: #b07070;
+  --neutral:  #8a8278;
+
+  /* Type */
+  --font-body:    'Jost', sans-serif;
+  --font-display: 'Cormorant Garamond', serif;
+
+  /* Layout */
+  --radius: 14px;
+}
+
+/* ─────────────────────────────────────────────
+   Reset & Base
+───────────────────────────────────────────── */
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  background: var(--cloud);
+  color: var(--ink);
+  font-family: var(--font-body);
+  font-weight: 300;
+  font-size: 13px;
+  line-height: 1.6;
+}
+
+/* ─────────────────────────────────────────────
+   Layout
+───────────────────────────────────────────── */
+.app {
+  max-width: 960px;
+  margin: 0 auto;
+  padding: 24px 20px;
+}
+
+.main-grid {
+  display: grid;
+  grid-template-columns: 1fr 320px;
+  gap: 14px;
+  align-items: start;
+}
+
+.right-col {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+/* ─────────────────────────────────────────────
+   Header
+───────────────────────────────────────────── */
+.header {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  margin-bottom: 20px;
+}
+
+.header h1 {
+  font-family: var(--font-display);
+  font-size: 2rem;
+  font-weight: 300;
+  letter-spacing: 0.01em;
+}
+
+.header h1 em {
+  font-style: italic;
+  color: var(--ink2);
+}
+
+.month-sel {
+  background: transparent;
+  border: none;
+  border-bottom: 1px solid var(--ink3);
+  color: var(--ink2);
+  font-family: var(--font-body);
+  font-size: 12px;
+  font-weight: 300;
+  padding: 3px 20px 3px 4px;
+  outline: none;
+  cursor: pointer;
+  appearance: none;
+  -webkit-appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6'%3E%3Cpath d='M0 0l5 6 5-6z' fill='%237a6f65'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 2px center;
+}
+
+/* ─────────────────────────────────────────────
+   Overview Pills
+───────────────────────────────────────────── */
+.overview {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 10px;
+  margin-bottom: 20px;
+}
+
+.pill {
+  background: var(--cloud2);
+  border-radius: 50px;
+  padding: 12px 18px;
+  text-align: center;
+}
+
+.pill-label {
+  font-size: 10px;
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  color: var(--ink3);
+  margin-bottom: 4px;
+}
+
+.pill-value {
+  font-family: var(--font-display);
+  font-size: 1.4rem;
+  font-weight: 300;
+}
+
+.pill-value.green  { color: var(--positive); }
+.pill-value.red    { color: var(--negative); }
+.pill-value.lav    { color: var(--lav2); }
+.pill-value.neutral { color: var(--neutral); }
+
+/* ─────────────────────────────────────────────
+   Income Section (Collapsible)
+───────────────────────────────────────────── */
+.income-section {
+  margin-bottom: 14px;
+}
+
+.income-toggle {
+  width: 100%;
+  background: var(--cloud2);
+  border: none;
+  border-radius: var(--radius);
+  padding: 12px 18px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  cursor: pointer;
+  font-family: var(--font-body);
+  text-align: left;
+}
+
+.tog-left {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.tog-title {
+  font-family: var(--font-display);
+  font-size: 1.05rem;
+  font-weight: 300;
+  color: var(--ink);
+}
+
+.tog-sub {
+  font-size: 11px;
+  color: var(--ink3);
+}
+
+.tog-arrow {
+  color: var(--ink3);
+  font-size: 14px;
+  transition: transform 0.25s;
+}
+
+.income-toggle.open .tog-arrow {
+  transform: rotate(180deg);
+}
+
+.income-panel {
+  background: var(--cloud2);
+  border-radius: var(--radius);
+  padding: 16px;
+  margin-top: 6px;
+  display: none;
+}
+
+.income-panel.open {
+  display: block;
+}
+
+/* ─────────────────────────────────────────────
+   Cards
+───────────────────────────────────────────── */
+.card {
+  background: #fff;
+  border-radius: var(--radius);
+  padding: 18px;
+  border: 0.5px solid var(--cloud3);
+}
+
+.card-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 14px;
+}
+
+.card-title {
+  font-family: var(--font-display);
+  font-size: 1.2rem;
+  font-weight: 300;
+  color: var(--ink);
+}
+
+/* ─────────────────────────────────────────────
+   Buttons
+───────────────────────────────────────────── */
+.btn {
+  border: none;
+  border-radius: 50px;
+  padding: 5px 14px;
+  font-family: var(--font-body);
+  font-size: 11px;
+  font-weight: 400;
+  cursor: pointer;
+  letter-spacing: 0.04em;
+}
+
+.btn:hover {
+  opacity: 0.8;
+}
+
+.btn-dark {
+  background: var(--ink);
+  color: #fff;
+}
+
+.btn-soft {
+  background: var(--cloud3);
+  color: var(--ink2);
+}
+
+.btn-soft:hover {
+  background: var(--cloud2);
+}
+
+/* ─────────────────────────────────────────────
+   Inputs & Selects
+───────────────────────────────────────────── */
+input[type="text"],
+input[type="number"] {
+  background: transparent;
+  border: none;
+  border-bottom: 1px solid transparent;
+  color: var(--ink);
+  font-family: var(--font-body);
+  font-size: 12px;
+  font-weight: 300;
+  padding: 3px 2px;
+  width: 100%;
+  outline: none;
+  transition: border-color 0.15s;
+}
+
+input:focus {
+  border-bottom-color: var(--ink3);
+}
+
+input::placeholder {
+  color: var(--ink3);
+}
+
+input[type="number"]::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+}
+
+select.cat-sel {
+  background: transparent;
+  border: none;
+  color: var(--ink2);
+  font-family: var(--font-body);
+  font-size: 11px;
+  font-weight: 300;
+  outline: none;
+  cursor: pointer;
+  width: 100%;
+}
+
+/* ─────────────────────────────────────────────
+   Delete Button
+───────────────────────────────────────────── */
+.del-btn {
+  background: none;
+  border: none;
+  color: var(--ink3);
+  cursor: pointer;
+  font-size: 16px;
+  line-height: 1;
+  padding: 0;
+  text-align: center;
+}
+
+.del-btn:hover {
+  color: var(--negative);
+}
+
+/* ─────────────────────────────────────────────
+   Category Legend
+───────────────────────────────────────────── */
+.legend {
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+  margin-bottom: 12px;
+}
+
+.leg-item {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 11px;
+  color: var(--ink2);
+}
+
+.cat-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  flex-shrink: 0;
+  display: inline-block;
+}
+
+/* ─────────────────────────────────────────────
+   Expense Rows
+───────────────────────────────────────────── */
+.exp-row {
+  display: grid;
+  grid-template-columns: 1fr 80px 90px 28px;
+  gap: 8px;
+  align-items: center;
+  padding: 8px 0;
+  border-bottom: 0.5px solid var(--cloud2);
+}
+
+.exp-row:last-of-type {
+  border-bottom: none;
+}
+
+.exp-item-cell {
+  display: flex;
+  align-items: center;
+}
+
+.exp-item-cell .cat-dot {
+  margin-right: 6px;
+}
+
+/* ─────────────────────────────────────────────
+   Budgeted Rows
+───────────────────────────────────────────── */
+.bud-col-heads {
+  display: grid;
+  grid-template-columns: 1fr 60px 60px 50px 22px;
+  gap: 6px;
+  padding-bottom: 6px;
+  border-bottom: 0.5px solid var(--cloud3);
+  font-size: 10px;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--ink3);
+}
+
+.bud-row {
+  display: grid;
+  grid-template-columns: 1fr 60px 60px 50px 22px;
+  gap: 6px;
+  align-items: center;
+  padding: 6px 0;
+  border-bottom: 0.5px solid var(--cloud2);
+}
+
+.bud-row:last-of-type {
+  border-bottom: none;
+}
+
+.diff-pill {
+  font-size: 10px;
+  border-radius: 50px;
+  padding: 1px 7px;
+  text-align: center;
+  font-weight: 400;
+}
+
+/* ─────────────────────────────────────────────
+   Budgeted real — computed, not editable
+───────────────────────────────────────────── */
+.bud-real-val {
+  font-size: 12px;
+  color: var(--positive);
+  font-weight: 400;
+  padding: 3px 2px;
+}
+
+.bud-real-empty {
+  color: var(--ink3);
+  font-style: italic;
+}
+
+.diff-pos { background: #e8f0e8; color: var(--positive); }
+.diff-neg { background: #f0e8e8; color: var(--negative); }
+
+/* ─────────────────────────────────────────────
+   Income Panel Sub-sections
+───────────────────────────────────────────── */
+.sub-section {
+  margin-bottom: 14px;
+}
+
+.sub-title {
+  font-size: 10px;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: var(--ink3);
+  margin-bottom: 8px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.col-head {
+  font-size: 10px;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--ink3);
+  padding-bottom: 4px;
+}
+
+.inc-row {
+  display: grid;
+  grid-template-columns: 1fr 80px 80px 22px;
+  gap: 8px;
+  align-items: center;
+  padding: 5px 0;
+  border-bottom: 0.5px solid var(--cloud3);
+}
+
+.inc-row-2 {
+  display: grid;
+  grid-template-columns: 1fr 80px 22px;
+  gap: 8px;
+  align-items: center;
+  padding: 5px 0;
+  border-bottom: 0.5px solid var(--cloud3);
+}
+
+.inc-row:last-of-type,
+.inc-row-2:last-of-type {
+  border-bottom: none;
+}
+
+.addl-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+}
+
+/* ─────────────────────────────────────────────
+   Totals & Remaining
+───────────────────────────────────────────── */
+.total-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding-top: 12px;
+  border-top: 0.5px solid var(--cloud3);
+  margin-top: 4px;
+}
+
+.total-label {
+  font-size: 10px;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: var(--ink3);
+}
+
+.total-val {
+  font-family: var(--font-display);
+  font-size: 1.1rem;
+}
+
+.remaining-card {
+  text-align: center;
+  padding: 20px;
+}
+
+.remaining-val {
+  font-family: var(--font-display);
+  font-size: 2.2rem;
+  font-weight: 300;
+  margin: 8px 0 4px;
+}
+
+.remaining-note {
+  font-size: 11px;
+  color: var(--ink3);
+  margin-top: 4px;
+}
+
+.progress-track {
+  background: var(--cloud2);
+  border-radius: 50px;
+  height: 5px;
+  margin-top: 14px;
+  overflow: hidden;
+}
+
+.progress-bar {
+  height: 100%;
+  border-radius: 50px;
+  transition: width 0.4s ease, background 0.4s ease;
+}
+
+/* ─────────────────────────────────────────────
+   Utilities
+───────────────────────────────────────────── */
+.divider {
+  height: 0.5px;
+  background: var(--cloud3);
+  margin: 12px 0;
+}
+
+.empty {
+  font-size: 11px;
+  color: var(--ink3);
+  font-style: italic;
+  padding: 6px 0;
+}
