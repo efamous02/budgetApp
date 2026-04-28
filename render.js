@@ -1,18 +1,20 @@
 // ─────────────────────────────────────────────
 //  HTML Builders  (return HTML strings)
+//  All month-specific data is read via M() so
+//  switching months always reflects fresh data.
 // ─────────────────────────────────────────────
 
 function buildMonthOptions() {
   return MONTHS
-    .map(m => `<option ${m === S.month ? "selected" : ""}>${m}</option>`)
+    .map(m => `<option ${m === S.currentMonth ? "selected" : ""}>${m}</option>`)
     .join("");
 }
 
 function buildOverview(t) {
   const cards = [
-    { label: "net income",  value: fmt(t.netIncome),      cls: "green"   },
-    { label: "taxes",       value: fmt(t.grossTaxes),     cls: "red"     },
-    { label: "total out",   value: fmt(t.totalExpenses),  cls: "neutral" },
+    { label: "net income", value: fmt(t.netIncome),     cls: "green"   },
+    { label: "taxes",      value: fmt(t.grossTaxes),    cls: "red"     },
+    { label: "total out",  value: fmt(t.totalExpenses), cls: "neutral" },
     {
       label: "remaining",
       value: (t.remaining < 0 ? "−" : "") + fmt(t.remaining),
@@ -30,12 +32,12 @@ function buildOverview(t) {
 }
 
 function buildPaycheckRows() {
-  return S.paychecks
+  return M().paychecks
     .map(p => `
       <div class="inc-row">
-        <input type="text"   value="${p.label}"  placeholder="Label"  data-a="pc-label"  data-id="${p.id}" />
-        <input type="number" value="${p.income}" placeholder="0.00"   data-a="pc-income" data-id="${p.id}" />
-        <input type="number" value="${p.taxes}"  placeholder="0.00"   data-a="pc-taxes"  data-id="${p.id}" />
+        <input type="text"   value="${p.label}"  placeholder="Label" data-a="pc-label"  data-id="${p.id}" />
+        <input type="number" value="${p.income}" placeholder="0.00"  data-a="pc-income" data-id="${p.id}" />
+        <input type="number" value="${p.taxes}"  placeholder="0.00"  data-a="pc-taxes"  data-id="${p.id}" />
         <button class="del-btn" data-a="del-pc" data-id="${p.id}">×</button>
       </div>`)
     .join("");
@@ -46,14 +48,15 @@ function buildAddlRows(items, aItem, aAmt, aDel) {
   return items
     .map(i => `
       <div class="inc-row-2">
-        <input type="text"   value="${i.item}"   placeholder="Item"  data-a="${aItem}" data-id="${i.id}" />
-        <input type="number" value="${i.amount}" placeholder="0.00"  data-a="${aAmt}"  data-id="${i.id}" />
+        <input type="text"   value="${i.item}"   placeholder="Item" data-a="${aItem}" data-id="${i.id}" />
+        <input type="number" value="${i.amount}" placeholder="0.00" data-a="${aAmt}"  data-id="${i.id}" />
         <button class="del-btn" data-a="${aDel}" data-id="${i.id}">×</button>
       </div>`)
     .join("");
 }
 
 function buildIncomePanel() {
+  const m = M();
   return `
     <div class="sub-section">
       <div class="sub-title">paychecks</div>
@@ -73,38 +76,39 @@ function buildIncomePanel() {
           additional income
           <button class="btn btn-soft" style="font-size:10px;padding:2px 10px" data-a="add-inc">+</button>
         </div>
-        ${buildAddlRows(S.addlIncome, "inc-item", "inc-amt", "del-inc")}
+        ${buildAddlRows(m.addlIncome, "inc-item", "inc-amt", "del-inc")}
       </div>
       <div class="sub-section">
         <div class="sub-title">
           additional taxes
           <button class="btn btn-soft" style="font-size:10px;padding:2px 10px" data-a="add-tax">+</button>
         </div>
-        ${buildAddlRows(S.addlTaxes, "tax-item", "tax-amt", "del-tax")}
+        ${buildAddlRows(m.addlTaxes, "tax-item", "tax-amt", "del-tax")}
       </div>
     </div>`;
 }
 
 function buildBudgetLineOptions(selectedId) {
-  const noneOpt = `<option value="">— unassigned —</option>`;
-  const lineOpts = S.budgeted
+  const noneOpt  = `<option value="">— unassigned —</option>`;
+  const lineOpts = M().budgeted
     .map(b => `<option value="${b.id}" ${b.id === selectedId ? "selected" : ""}>${b.item || "unnamed"}</option>`)
     .join("");
   return noneOpt + lineOpts;
 }
 
 function buildExpenseRows() {
-  if (S.expenses.length === 0) {
+  const m = M();
+  if (m.expenses.length === 0) {
     return `<div class="empty" style="padding:12px 0">no expenses yet — add one above</div>`;
   }
-  return S.expenses
+  return m.expenses
     .map(e => {
-      const budIdx = S.budgeted.findIndex(b => b.id === e.budgetId);
+      const budIdx   = m.budgeted.findIndex(b => b.id === e.budgetId);
       const dotColor = budIdx >= 0 ? budgetLineColor(budIdx) : "#ccc";
       return `
         <div class="exp-row">
           <div class="exp-item-cell">
-            <span class="cat-dot" style="background:${dotColor}; margin-right:6px"></span>
+            <span class="cat-dot" style="background:${dotColor};margin-right:6px"></span>
             <input type="text" value="${e.item}" placeholder="Item" data-a="exp-item" data-id="${e.id}" />
           </div>
           <input type="number" value="${e.amount}" placeholder="0.00" data-a="exp-amt" data-id="${e.id}" />
@@ -118,11 +122,11 @@ function buildExpenseRows() {
 }
 
 function buildBudgetedRows() {
-  return S.budgeted
+  return M().budgeted
     .map((b, idx) => {
-      const est  = parseFloat(b.est)  || 0;
-      const real = parseFloat(b.real) || 0;
-      const diff = est - real;
+      const est      = parseFloat(b.est)  || 0;
+      const real     = parseFloat(b.real) || 0;
+      const diff     = est - real;
       const diffCls  = diff >= 0 ? "diff-pos" : "diff-neg";
       const diffText = (diff >= 0 ? "+" : "−") + Math.abs(diff).toFixed(0);
       const dotColor = budgetLineColor(idx);
@@ -147,41 +151,39 @@ function buildBudgetedRows() {
 //  Main Render
 // ─────────────────────────────────────────────
 function render() {
-  computeBudgetedReals(S);
-  saveState(S);
-  const t = calcTotals(S);
+  computeBudgetedReals();
+  saveState();
+  const t = calcTotals();
 
-  // Month select
+  // Month select — rebuilt every render so selected month stays in sync
   const monthSel = document.getElementById("monthSel");
-  if (!monthSel.children.length) {
-    monthSel.innerHTML = buildMonthOptions();
-  }
-  monthSel.value = S.month;
+  monthSel.innerHTML = buildMonthOptions();
 
-  // Overview
+  // Overview pills
   document.getElementById("overview").innerHTML = buildOverview(t);
 
-  // Income toggle summary text
+  // Income toggle subtitle
   document.getElementById("incSub").textContent =
     `${fmt(t.netIncome)} net · ${fmt(t.grossTaxes)} in taxes`;
 
-  // Income toggle open/close state
+  // Income panel open/close
   const toggle = document.getElementById("incomeToggle");
   const panel  = document.getElementById("incomePanel");
-  toggle.classList.toggle("open", S.incomeOpen);
-  toggle.setAttribute("aria-expanded", S.incomeOpen);
-  panel.classList.toggle("open", S.incomeOpen);
-  panel.setAttribute("aria-hidden", !S.incomeOpen);
-  if (S.incomeOpen) panel.innerHTML = buildIncomePanel();
+  const isOpen = M().incomeOpen;
+  toggle.classList.toggle("open", isOpen);
+  toggle.setAttribute("aria-expanded", isOpen);
+  panel.classList.toggle("open", isOpen);
+  panel.setAttribute("aria-hidden", !isOpen);
+  panel.innerHTML = isOpen ? buildIncomePanel() : "";
 
   // Expenses
   document.getElementById("expList").innerHTML = buildExpenseRows();
   const expTotal = document.getElementById("expTotal");
-  expTotal.textContent  = fmt(t.totalExpenses);
-  expTotal.style.color  = t.totalExpenses > 0 ? "var(--negative)" : "var(--ink3)";
+  expTotal.textContent = fmt(t.totalExpenses);
+  expTotal.style.color = t.totalExpenses > 0 ? "var(--negative)" : "var(--ink3)";
 
   // Budgeted
-  document.getElementById("budList").innerHTML = buildBudgetedRows();
+  document.getElementById("budList").innerHTML    = buildBudgetedRows();
   document.getElementById("budTotal").textContent = `${fmt(t.budgetedEst)} est`;
 
   // Remaining card
@@ -194,8 +196,8 @@ function render() {
 
   if (t.netIncome > 0) {
     const pct = Math.max(0, Math.min(100, (t.remaining / t.netIncome) * 100));
-    remainNote.textContent  = `${pct.toFixed(0)}% of net income left`;
-    remainBar.style.width   = pct + "%";
+    remainNote.textContent = `${pct.toFixed(0)}% of net income left`;
+    remainBar.style.width  = pct + "%";
     remainBar.style.background =
       pct > 30 ? "var(--sage2)" :
       pct > 10 ? "var(--blush2)" :

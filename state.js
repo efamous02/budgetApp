@@ -26,90 +26,130 @@ function uid() {
 }
 
 // ─────────────────────────────────────────────
-//  Default State
+//  Default Month Data
+//  One of these is created for each month.
 // ─────────────────────────────────────────────
-function defaultState() {
+function defaultMonthData() {
   return {
-    month: MONTHS[new Date().getMonth()],
     incomeOpen: false,
     paychecks: [
-      { id: 1, label: "Paycheck 1", income: "", taxes: "" },
-      { id: 2, label: "Paycheck 2", income: "", taxes: "" },
+      { id: uid(), label: "Paycheck 1", income: "", taxes: "" },
+      { id: uid(), label: "Paycheck 2", income: "", taxes: "" },
     ],
     addlIncome: [],
     addlTaxes:  [],
     expenses:   [],
     budgeted: [
-      { id: 1, item: "Rent",      est: "" },
-      { id: 2, item: "Groceries", est: "" },
-      { id: 3, item: "Savings",   est: "" },
+      { id: uid(), item: "Rent",      est: "" },
+      { id: uid(), item: "Groceries", est: "" },
+      { id: uid(), item: "Savings",   est: "" },
     ],
   };
 }
 
 // ─────────────────────────────────────────────
+//  Top-level State Shape
+//
+//  S = {
+//    currentMonth: "April",
+//    months: {
+//      "January": { incomeOpen, paychecks, addlIncome, addlTaxes, expenses, budgeted },
+//      "April":   { ... },
+//      ...
+//    }
+//  }
+//
+//  Months are created on first access — only months
+//  you've actually visited/edited are stored.
+// ─────────────────────────────────────────────
+function defaultState() {
+  const current = MONTHS[new Date().getMonth()];
+  return {
+    currentMonth: current,
+    months: {
+      [current]: defaultMonthData(),
+    },
+  };
+}
+
+// ─────────────────────────────────────────────
+//  Active Month Accessor
+//  Always use M() to read/write the current month's data.
+//  Automatically creates a blank month on first access.
+// ─────────────────────────────────────────────
+function M() {
+  if (!S.months[S.currentMonth]) {
+    S.months[S.currentMonth] = defaultMonthData();
+  }
+  return S.months[S.currentMonth];
+}
+
+// ─────────────────────────────────────────────
 //  Persistence
 // ─────────────────────────────────────────────
-const STORAGE_KEY = "budget_v3";
+const STORAGE_KEY = "budget_v4";
 
 function loadState() {
   try {
-    return JSON.parse(localStorage.getItem(STORAGE_KEY)) || defaultState();
+    const saved = JSON.parse(localStorage.getItem(STORAGE_KEY));
+    return saved || defaultState();
   } catch {
     return defaultState();
   }
 }
 
-function saveState(state) {
-  localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+function saveState() {
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(S));
 }
 
 // ─────────────────────────────────────────────
 //  Compute Budgeted Reals from Expenses
-//  Sums all expenses linked to each budget line
-//  and writes the result back into b.real.
-//  Call this before calcTotals and before render.
+//  Sums all expenses per budget line and writes
+//  the result back into b.real for the active month.
 // ─────────────────────────────────────────────
-function computeBudgetedReals(state) {
-  // Build a map: budgetId → total amount
+function computeBudgetedReals() {
+  const m = M();
+
+  // Build totals map: budgetId → summed amount
   const totals = {};
-  for (const e of state.expenses) {
+  for (const e of m.expenses) {
     if (!e.budgetId) continue;
-    const amt = parseFloat(e.amount) || 0;
-    totals[e.budgetId] = (totals[e.budgetId] || 0) + amt;
+    totals[e.budgetId] = (totals[e.budgetId] || 0) + (parseFloat(e.amount) || 0);
   }
 
-  // Write real values onto each budgeted line
-  for (const b of state.budgeted) {
+  // Write back onto each budgeted line
+  for (const b of m.budgeted) {
     b.real = (totals[b.id] || 0).toFixed(2);
   }
 }
 
 // ─────────────────────────────────────────────
-//  Derived Calculations
+//  Derived Calculations  (active month only)
 // ─────────────────────────────────────────────
-function calcTotals(state) {
+function calcTotals() {
+  const m = M();
+
   const grossIncome =
-    state.paychecks.reduce((sum, p) => sum + (parseFloat(p.income) || 0), 0) +
-    state.addlIncome.reduce((sum, i) => sum + (parseFloat(i.amount) || 0), 0);
+    m.paychecks.reduce((sum, p) => sum + (parseFloat(p.income) || 0), 0) +
+    m.addlIncome.reduce((sum, i) => sum + (parseFloat(i.amount) || 0), 0);
 
   const grossTaxes =
-    state.paychecks.reduce((sum, p) => sum + (parseFloat(p.taxes) || 0), 0) +
-    state.addlTaxes.reduce((sum, t) => sum + (parseFloat(t.amount) || 0), 0);
+    m.paychecks.reduce((sum, p) => sum + (parseFloat(p.taxes) || 0), 0) +
+    m.addlTaxes.reduce((sum, t) => sum + (parseFloat(t.amount) || 0), 0);
 
   const totalExpenses =
-    state.expenses.reduce((sum, e) => sum + (parseFloat(e.amount) || 0), 0);
+    m.expenses.reduce((sum, e) => sum + (parseFloat(e.amount) || 0), 0);
 
-  const netIncome  = grossIncome - grossTaxes;
-  const remaining  = netIncome - totalExpenses;
-  const budgetedEst  = state.budgeted.reduce((sum, b) => sum + (parseFloat(b.est)  || 0), 0);
-  const budgetedReal = state.budgeted.reduce((sum, b) => sum + (parseFloat(b.real) || 0), 0);
+  const netIncome    = grossIncome - grossTaxes;
+  const remaining    = netIncome - totalExpenses;
+  const budgetedEst  = m.budgeted.reduce((sum, b) => sum + (parseFloat(b.est)  || 0), 0);
+  const budgetedReal = m.budgeted.reduce((sum, b) => sum + (parseFloat(b.real) || 0), 0);
 
   return { grossIncome, grossTaxes, totalExpenses, netIncome, remaining, budgetedEst, budgetedReal };
 }
 
 // ─────────────────────────────────────────────
-//  Formatting Helpers
+//  Formatting Helper
 // ─────────────────────────────────────────────
 function fmt(n) {
   return "$" + Math.abs(n).toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g, ",");
