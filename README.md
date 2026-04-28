@@ -1,7 +1,7 @@
 Budget Application built w/ Claude
 
 --------------------------------
-This budget web app was built to mirror my current spreadsheet setup. It should be able to take in income, taxes, expenses, a budget, and give you a summary month by month. IT is currently scoped locally with potential to build in saves, logins, etc at a later date. 
+This budget web app was built to mirror my current spreadsheet setup. It should be able to take in income, taxes, expenses, a budget, and give you a summary month by month. It is currently scoped locally with potential to build in saves, logins, etc at a later date. 
 --------------------------------
 
 +++ TODO
